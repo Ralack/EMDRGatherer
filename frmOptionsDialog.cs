@@ -14,10 +14,30 @@ namespace EMDRGatherer
 {
     public partial class frmOptionsDialog : Form
     {
+        DataConnectionDialog dcd;
+
         public frmOptionsDialog()
         {
 
             InitializeComponent();
+        }
+
+        public frmOptionsDialog( EmdrConfig _cfg)
+        {
+            dcd = new DataConnectionDialog();
+
+            InitializeComponent();
+
+            dcd.ConnectionString = _cfg.Attr.DataSource;
+            tbDataBaseConnName.Text = _cfg.Attr.DataSource;
+            tbDiskBufferSize.Text = _cfg.Attr.QueueDiskBufferSize.ToString();
+            tbHighWaterMark.Text = _cfg.Attr.QueueHighWaterMark.ToString();
+            tbHistTrimDays.Text = _cfg.Attr.TrimHistDays.ToString();
+            tbOrdTrimDays.Text = _cfg.Attr.TrimOrdersDays.ToString();
+            cbEmdrServer.Text = _cfg.Attr.EMDRServer;
+            cbMergeDuplicates.Checked = _cfg.Attr.MergeDuplicates;
+            cbMessageBufferSettings.Checked = _cfg.Attr.AdvMsgBufferEnabled;
+
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -74,15 +94,15 @@ namespace EMDRGatherer
         {
             if (cbMessageBufferSettings.Checked == true)
             {
-                
-                tbDiskBufferSize.Enabled = true;
-                //tbHighWaterMark.Enabled = true;
+                // Disk Buffer not implemented (is it exposed in the clr bindings for ZeroMQ?
+                //tbDiskBufferSize.Enabled = true;
+                tbHighWaterMark.Enabled = true;
             }
             else
             {
-                
-                tbDiskBufferSize.Enabled = false;
-                //tbHighWaterMark.Enabled = false;
+                // Disk Buffer not implemented (is it exposed in the clr bindings for ZeroMQ?   
+                // tbDiskBufferSize.Enabled = false;
+                tbHighWaterMark.Enabled = false;
             }
         }
 
@@ -136,9 +156,8 @@ namespace EMDRGatherer
 
         private void btnSqlConnection_Click(object sender, EventArgs e)
         {
-            DataConnectionDialog dcd = new DataConnectionDialog();
-            //ToDo: Load the existing configuration if present
-            DataConnectionConfiguration dcs = new DataConnectionConfiguration(null);
+            DataConnectionConfiguration dcs = new DataConnectionConfiguration(null); ;
+                                   
             dcs.LoadConfiguration(dcd);
 
             if (DataConnectionDialog.Show(dcd) == DialogResult.OK)

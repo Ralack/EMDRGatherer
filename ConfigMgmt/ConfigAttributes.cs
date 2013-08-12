@@ -12,6 +12,8 @@ namespace EMDRGatherer.ConfigMgmt
     [Serializable(), XmlRootAttribute("EMDR")]
     public class ConfigAttributes
     {
+        [XmlIgnore]
+        public bool isConfiged { get; set; }
         
         [XmlAttribute("ConnectionString")]
         public string DataSource { get; set; }
@@ -25,7 +27,7 @@ namespace EMDRGatherer.ConfigMgmt
         [XmlAttribute("TrimHistoryDays")]
         public int TrimHistDays { get; set; }
 
-        [XmlArrayItem("Server")]
+        [XmlAttribute("Server")]
         public string EMDRServer { get; set; }
 
         [XmlAttribute("MQZeroAdvancedEnabled")]

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.IO;
 using EMDRGatherer.ConfigMgmt;
@@ -12,12 +14,12 @@ using EMDRGatherer.Util;
 
 namespace EMDRGatherer
 {    
-    class EmdrConfig 
+    public class EmdrConfig 
     {
-        [XmlIgnore]
         private const string cfgFileName = "emdrconfig.xml";
+       
         private const string Appname = "EMDRGatherer";
-
+        
         public ConfigAttributes Attr {get; set;}
         public ConfigState CfgState { get; set; }
 
@@ -50,13 +52,30 @@ namespace EMDRGatherer
                     string filename = futl.getConfigFilePath();
 
                     StreamReader rdr = new StreamReader(filename);
-                    XmlSerializer xserial = new XmlSerializer(Attr.GetType());
 
-                    Attr = (ConfigAttributes)xserial.Deserialize(rdr);
+                    if (!rdr.EndOfStream)
+                    {
+                        XmlSerializer xserial = new XmlSerializer(Attr.GetType());
+                        Attr = (ConfigAttributes)xserial.Deserialize(rdr);
+                        rdr.Close();
+                    }
+                    else
+                    {
+                        rdr.Close();
+                        return ConfigState.ConfigNotFound;
+                    }
 
-                    rdr.Close();
-
-                    return ConfigState.ConfigLoaded;
+                    if (checkConfig())
+                    {
+                        Attr.isConfiged = true;
+                        return ConfigState.ConfigLoaded;
+                    }
+                    else
+                    {
+                        Attr.isConfiged = false;
+                        return ConfigState.ConfigInvalid;
+                    }
+                    
 
                 }
                 catch (Exception ex)
@@ -83,22 +102,64 @@ namespace EMDRGatherer
 
             try
             {
-                string filename = futl.getConfigFilePath();
+                if(checkConfig())
+                {
+                    string filename = futl.getConfigFilePath();
 
-                FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                XmlSerializer xserial = new XmlSerializer(Attr.GetType());
-                xserial.Serialize(fs, Attr);
+                    FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    XmlSerializer xserial = new XmlSerializer(Attr.GetType());
+                    xserial.Serialize(fs, Attr);
 
-                fs.Flush();
-                fs.Close();
+                    fs.Flush();
+                    fs.Close();                
 
-                return ConfigState.ConfigSaved;
-                
+                    return ConfigState.ConfigSaved;
+                }
+                else
+                {
+                    return ConfigState.ConfigInvalid;
+                }
             }            
             catch (Exception ex)
             {                
                 throw ex;
             }
+        }
+
+        public bool checkConfig()
+        {
+            try
+            {
+                Uri uri = new Uri(Attr.EMDRServer);
+
+                if (!uri.IsWellFormedOriginalString())
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            try
+            {
+                var conn = new SqlConnectionStringBuilder(Attr.DataSource);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            if (Attr.QueueDiskBufferSize < 0 || Attr.QueueDiskBufferSize > 1000000 ||
+                    Attr.QueueHighWaterMark < 0 || Attr.QueueHighWaterMark > 1000000 ||
+                    Attr.TrimHistDays < 0 || Attr.TrimHistDays > 1000000 ||
+                    Attr.TrimOrdersDays < 0 || Attr.TrimOrdersDays > 1000000)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         
@@ -110,7 +171,8 @@ namespace EMDRGatherer
         ConfigBlank = 0x02,
         ConfigNotLoaded = 0x04,
         ConfigNotFound = 0x08,
-        ConfigSaved = 0x16
+        ConfigSaved = 0x16,
+        ConfigInvalid = 0x32
     }
    
 }

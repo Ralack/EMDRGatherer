@@ -30,14 +30,18 @@ namespace EMDRGatherer
             bw = new BackgroundWorker();
             trimBw = new BackgroundWorker();
 
+            InitializeComponent();
+
             config = new EmdrConfig();
 
             if (config.CfgState != ConfigState.ConfigLoaded)
             {
-                if (OpenOptionDialog() == ConfigState.ConfigLoaded)
+                while (OpenOptionDialog() != ConfigState.ConfigLoaded)
                 {
-                    btnStartCapture.Enabled = true;
+                    MessageBox.Show(this, "Configuation is Invalid. Please complete the configuration to continue.", "Invalid Configuration", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 }
+                btnStartCapture.Enabled = true;
             }
             else
             {
@@ -53,7 +57,7 @@ namespace EMDRGatherer
             trimBw.WorkerSupportsCancellation = true;
             trimBw.DoWork += new DoWorkEventHandler(edl.trimOrderData);
 
-            InitializeComponent();
+            
         }
     #endregion
 
