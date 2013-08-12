@@ -43,22 +43,11 @@ namespace EMDRGatherer
 
                     BackgroundWorker worker = sender as BackgroundWorker;
                                         
-                    //Connect to the first publicly available relay.
-                    //sub.
+                    //Connect to the first publicly available relay.                  
                     sub.Connect(inArgs.EMDRServer);
                     
                     // Disable filtering.
                     sub.SetSockOpt(SocketOpt.SUBSCRIBE, Encoding.UTF8.GetBytes(""));
-
-                    if(inArgs.HighWaterMark > 0)
-                        sub.SetSockOpt(SocketOpt.HWM, inArgs.HighWaterMark);
-
-                    //if(inArgs.DiskBufferSize > 0)
-                    //    sub.SetSockOpt(SocketOpt.
-                    
-                    // Alternatively 'Subscribe' can be used
-                    //sub.Subscribe("", Encoding.UTF8);
-                                     
 
                     while (worker.CancellationPending == false)
                     {
@@ -128,33 +117,38 @@ namespace EMDRGatherer
             
             foreach (Rowset rs in edata.Rowsets)
             {
-                
-                foreach (History hs in rs.HistoryRows)
-                {                   
-                    hisTblAdptr.insEmdrHistoryData( (int)rs.RegionID, rs.TypeID, hs.Date, hs.DateLocalTime,
-                        hs.Orders, hs.Quantity, hs.High, hs.Low, hs.Average);
+                if (bwinargs.CaptureHistory)
+                {
+                    foreach (History hs in rs.HistoryRows)
+                    {
+                        hisTblAdptr.insEmdrHistoryData((int)rs.RegionID, rs.TypeID, hs.Date, hs.DateLocalTime,
+                            hs.Orders, hs.Quantity, hs.High, hs.Low, hs.Average);
+                    }
                 }
 
-                foreach (Order or in rs.OrderRows)
+                if (bwinargs.CaptureOrders)
                 {
-                    if (bwinargs.MergeDupes)
+                    foreach (Order or in rs.OrderRows)
                     {
-                        //We are merging duplicates (i.e. keeping newest record only)
-                        ordTblAdptr.mergeEMDROrderData((int)rs.RegionID, rs.TypeID,
-                            rs.GeneratedAt, rs.GeneratedAtLocalTime,
-                            or.IssueDate, or.IssueDateLocalTime, (int)or.SolarSystemID,
-                            or.StationID, or.OrderID, or.Range, or.VolEntered, or.VolRemaining, or.MinVolume, or.Price,
-                            or.Duration, BitConverter.GetBytes(or.Bid)[0]);
-                    }
-                    else
-                    {
-                        //Capturing everything, something else is dealing with the multiple rows per orderid
-                        ordTblAdptr.Insert((int)rs.RegionID, rs.TypeID,
-                            rs.GeneratedAt, rs.GeneratedAtLocalTime,
-                            or.IssueDate, or.IssueDateLocalTime, (int)or.SolarSystemID,
-                            or.StationID, or.OrderID, or.Range, or.VolEntered, or.VolRemaining, or.MinVolume, or.Price,
-                            or.Duration, BitConverter.GetBytes(or.Bid)[0]);
+                        if (bwinargs.MergeDupes)
+                        {
+                            //We are merging duplicates (i.e. keeping newest record only)
+                            ordTblAdptr.mergeEMDROrderData((int)rs.RegionID, rs.TypeID,
+                                rs.GeneratedAt, rs.GeneratedAtLocalTime,
+                                or.IssueDate, or.IssueDateLocalTime, (int)or.SolarSystemID,
+                                or.StationID, or.OrderID, or.Range, or.VolEntered, or.VolRemaining, or.MinVolume, or.Price,
+                                or.Duration, BitConverter.GetBytes(or.Bid)[0]);
+                        }
+                        else
+                        {
+                            //Capturing everything, something else is dealing with the multiple rows per orderid
+                            ordTblAdptr.Insert((int)rs.RegionID, rs.TypeID,
+                                rs.GeneratedAt, rs.GeneratedAtLocalTime,
+                                or.IssueDate, or.IssueDateLocalTime, (int)or.SolarSystemID,
+                                or.StationID, or.OrderID, or.Range, or.VolEntered, or.VolRemaining, or.MinVolume, or.Price,
+                                or.Duration, BitConverter.GetBytes(or.Bid)[0]);
 
+                        }
                     }
                 }
             }
@@ -195,19 +189,17 @@ namespace EMDRGatherer
     {    
         public string EMDRServer { get; set; }
         public string ConnStr { get; set; }
-        public bool MergeDupes { get; set; }
-        public bool AdvMBSettings { get; set; }
-        public int HighWaterMark { get; set; }
-        public int DiskBufferSize { get; set; }        
+        public bool MergeDupes { get; set; }   
+        public bool CaptureHistory { get; set; }
+        public bool CaptureOrders { get; set; }
 
-        public bwWorkerArgs(string eserver, string connstr, bool mergedupes, bool advmbsettings, int highwatermark, int diskbuffsize)
+        public bwWorkerArgs(string eserver, string connstr, bool mergedupes, bool capturehistory, bool captureorders)
         {
             EMDRServer = eserver;
             ConnStr = connstr;
-            MergeDupes = mergedupes;
-            AdvMBSettings = advmbsettings;
-            HighWaterMark = highwatermark;
-            DiskBufferSize = diskbuffsize;
+            MergeDupes = mergedupes;           
+            CaptureHistory = capturehistory;
+            CaptureOrders = captureorders;
         }
     }
 

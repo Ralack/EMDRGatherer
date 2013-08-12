@@ -120,20 +120,6 @@
   <metadata name="ttOptionDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="tbHighWaterMark.ToolTip" xml:space="preserve">
-    <value>Queue High Water Mark sets the maximum
-number of messages that the message queues
-will store per EMDR server connection before
-messages begin to be dropped or error states
-are raised. (Range 0- 1000000, 0 = disable)</value>
-  </data>
-  <data name="tbDiskBufferSize.ToolTip" xml:space="preserve">
-    <value>Disk Buffer Size sets the maximum disk
-buffer per EMDR Server in megabytes.
-Setting this option will allow the 
-connection to exceed the High Water Mark
-setting above. (Range 1- 1000000 MB, 0 = disable)</value>
-  </data>
   <data name="cbMergeDuplicates.ToolTip" xml:space="preserve">
     <value>When Merge Duplicates is enabled, the
 message engine performs a "Merge" on

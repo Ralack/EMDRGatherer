@@ -18,6 +18,7 @@ namespace EMDRGatherer
 
         public frmOptionsDialog()
         {
+            dcd = new DataConnectionDialog();
 
             InitializeComponent();
         }
@@ -29,14 +30,11 @@ namespace EMDRGatherer
             InitializeComponent();
 
             dcd.ConnectionString = _cfg.Attr.DataSource;
-            tbDataBaseConnName.Text = _cfg.Attr.DataSource;
-            tbDiskBufferSize.Text = _cfg.Attr.QueueDiskBufferSize.ToString();
-            tbHighWaterMark.Text = _cfg.Attr.QueueHighWaterMark.ToString();
+            tbDataBaseConnName.Text = _cfg.Attr.DataSource;            
             tbHistTrimDays.Text = _cfg.Attr.TrimHistDays.ToString();
             tbOrdTrimDays.Text = _cfg.Attr.TrimOrdersDays.ToString();
             cbEmdrServer.Text = _cfg.Attr.EMDRServer;
-            cbMergeDuplicates.Checked = _cfg.Attr.MergeDuplicates;
-            cbMessageBufferSettings.Checked = _cfg.Attr.AdvMsgBufferEnabled;
+            cbMergeDuplicates.Checked = _cfg.Attr.MergeDuplicates;            
 
         }
 
@@ -49,70 +47,8 @@ namespace EMDRGatherer
         {
             this.DialogResult = DialogResult.Cancel;
         }
-
-        private void tbDiskBufferSize_TextChanged(object sender, EventArgs e)
-        {
-            if (System.Text.RegularExpressions.Regex.IsMatch("[^0-9]", tbDiskBufferSize.Text))
-            {
-                MessageBox.Show(@"Valid values are 0 to 1000000 MB.", "Invalid Input", MessageBoxButtons.OK);
-                tbDiskBufferSize.Text.Remove(tbDiskBufferSize.Text.Length - 1);
-
-                return;
-            }
-            else if (int.Parse(tbDiskBufferSize.Text) < 1 || int.Parse(tbDiskBufferSize.Text) > 1000000)
-            {
-                MessageBox.Show(@"Valid values are 0 to 1000000 MB.", "Invalid Input", MessageBoxButtons.OK);
-
-                if (Int64.Parse(tbDiskBufferSize.Text) < 1)
-                    tbDiskBufferSize.Text = @"0";
-                else
-                    tbDiskBufferSize.Text = @"1000000";
-            }
-        }
-
-        private void tbHighWaterMark_TextChanged(object sender, EventArgs e)
-        {
-            if (System.Text.RegularExpressions.Regex.IsMatch("[^0-9]", tbHighWaterMark.Text))
-            {
-                MessageBox.Show(@"Valid values are 1 to 1000000 Messages.", "Invalid Input", MessageBoxButtons.OK);
-                tbHighWaterMark.Text.Remove(tbHighWaterMark.Text.Length - 1);
-
-                return;
-            }
-            else if (int.Parse(tbHighWaterMark.Text) < 0 || int.Parse(tbHighWaterMark.Text) > 1000000)
-            {
-                MessageBox.Show(@"Valid values are 0 to 1000000 Messages.", "Invalid Input", MessageBoxButtons.OK);
-
-                if (Int64.Parse(tbHighWaterMark.Text) < 0)
-                    tbHighWaterMark.Text = @"0";
-                else
-                    tbHighWaterMark.Text = @"1000000";
-            }
-        }
-
-        private void cbMessageBufferSettings_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbMessageBufferSettings.Checked == true)
-            {
-                // Disk Buffer not implemented (is it exposed in the clr bindings for ZeroMQ?
-                //tbDiskBufferSize.Enabled = true;
-                tbHighWaterMark.Enabled = true;
-            }
-            else
-            {
-                // Disk Buffer not implemented (is it exposed in the clr bindings for ZeroMQ?   
-                // tbDiskBufferSize.Enabled = false;
-                tbHighWaterMark.Enabled = false;
-            }
-        }
-
-        
-
-        private void cbMergeDuplicates_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-       
+               
+                     
         private void tbOrdTrimDays_TextChanged(object sender, EventArgs e)
         {
             if (System.Text.RegularExpressions.Regex.IsMatch("[^0-9]", tbOrdTrimDays.Text))
@@ -167,14 +103,31 @@ namespace EMDRGatherer
             }
         }
 
-        private void frmOptionsDialog_Load(object sender, EventArgs e)
+        private void cbCaptureHistory_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (cbCaptureHistory.Checked == false)
+            {
+                tbHistTrimDays.Enabled = false;
+                tbHistTrimDays.Text = "0";
+            }
+            else
+            {
+                tbHistTrimDays.Enabled = true;
+                
+            }
         }
 
-        private void clbEMDRServers_SelectedIndexChanged(object sender, EventArgs e)
+        private void cbCaptureOrders_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (cbCaptureOrders.Checked == false)
+            {
+                tbOrdTrimDays.Enabled = false;
+                tbOrdTrimDays.Text = "0";
+            }
+            else
+            {
+                tbOrdTrimDays.Enabled = true;
+            }
         }
     }
 }

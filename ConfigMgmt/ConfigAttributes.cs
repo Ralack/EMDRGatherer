@@ -21,6 +21,12 @@ namespace EMDRGatherer.ConfigMgmt
         [XmlAttribute("MergeOrderData")]
         public bool MergeDuplicates { get; set; }
 
+        [XmlAttribute("CaptureHistory")]
+        public bool CaptureHistory { get; set; }
+
+        [XmlAttribute("CaptureOrders")]
+        public bool CaptureOrders { get; set; }
+
         [XmlAttribute("TrimOrderDays")]
         public int TrimOrdersDays { get; set; }
 
@@ -28,16 +34,6 @@ namespace EMDRGatherer.ConfigMgmt
         public int TrimHistDays { get; set; }
 
         [XmlAttribute("Server")]
-        public string EMDRServer { get; set; }
-
-        [XmlAttribute("MQZeroAdvancedEnabled")]
-        public bool AdvMsgBufferEnabled { get; set; }
-
-        [XmlAttribute("MQZeroHighWaterMark")]
-        public int QueueHighWaterMark { get; set; }
-
-        [XmlAttribute("MQZeroDiskBufferMax")]
-        public int QueueDiskBufferSize { get; set; }
-       
+        public string EMDRServer { get; set; }      
     }
 }

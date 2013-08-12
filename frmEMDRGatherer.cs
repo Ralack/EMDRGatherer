@@ -36,10 +36,17 @@ namespace EMDRGatherer
 
             if (config.CfgState != ConfigState.ConfigLoaded)
             {
+                DialogResult res;
                 while (OpenOptionDialog() != ConfigState.ConfigLoaded)
                 {
-                    MessageBox.Show(this, "Configuation is Invalid. Please complete the configuration to continue.", "Invalid Configuration", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    res = MessageBox.Show(this, "Configuation is Invalid. Please complete the configuration to continue. Press OK to try again or cancel to close the program" 
+                        , "Invalid Configuration", 
+                        MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk);
+
+                    if (res == DialogResult.Cancel)
+                    {
+                        this.Close();
+                    }
                 }
                 btnStartCapture.Enabled = true;
             }
@@ -73,7 +80,7 @@ namespace EMDRGatherer
             if (bw.IsBusy != true)
             {
                 bwArgs = new bwWorkerArgs(config.Attr.EMDRServer, config.Attr.DataSource, config.Attr.MergeDuplicates, 
-                    config.Attr.AdvMsgBufferEnabled, config.Attr.QueueHighWaterMark, config.Attr.QueueDiskBufferSize);
+                    config.Attr.CaptureHistory, config.Attr.CaptureOrders);
 
                 bw.RunWorkerAsync(bwArgs);
 
@@ -96,6 +103,10 @@ namespace EMDRGatherer
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (bw.IsBusy)
+            {
+                bw.CancelAsync();
+            }
             this.Close();
         }
 
@@ -157,6 +168,7 @@ namespace EMDRGatherer
             }
 
             btnStopCapture.Enabled = false;
+            btnStartCapture.Enabled = true;
         }
 
         private void trimBw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -184,20 +196,19 @@ namespace EMDRGatherer
         private ConfigState OpenOptionDialog()
         {
             DialogResult result;
-            frmOptionsDialog optionsDlg = new frmOptionsDialog();
+            frmOptionsDialog optionsDlg = new frmOptionsDialog(config);
 
             result = optionsDlg.ShowDialog();
 
             if (result == DialogResult.OK)
             {
                 config.Attr.DataSource = optionsDlg.tbDataBaseConnName.Text;
-                config.Attr.MergeDuplicates = optionsDlg.cbMergeDuplicates.Checked;
-                config.Attr.AdvMsgBufferEnabled = optionsDlg.cbMessageBufferSettings.Checked;
-                config.Attr.QueueDiskBufferSize = int.Parse(optionsDlg.tbDiskBufferSize.Text);
-                config.Attr.QueueHighWaterMark = int.Parse(optionsDlg.tbHighWaterMark.Text);
+                config.Attr.MergeDuplicates = optionsDlg.cbMergeDuplicates.Checked;               
                 config.Attr.TrimOrdersDays = int.Parse(optionsDlg.tbOrdTrimDays.Text);
                 config.Attr.TrimHistDays = int.Parse(optionsDlg.tbHistTrimDays.Text);
                 config.Attr.EMDRServer = optionsDlg.cbEmdrServer.Text;
+                config.Attr.CaptureHistory = optionsDlg.cbCaptureHistory.Checked;
+                config.Attr.CaptureOrders = optionsDlg.cbCaptureOrders.Checked;
                 
 
                 //Write out the new config options

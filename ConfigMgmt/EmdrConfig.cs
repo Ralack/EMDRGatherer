@@ -151,9 +151,7 @@ namespace EMDRGatherer
                 return false;
             }
 
-            if (Attr.QueueDiskBufferSize < 0 || Attr.QueueDiskBufferSize > 1000000 ||
-                    Attr.QueueHighWaterMark < 0 || Attr.QueueHighWaterMark > 1000000 ||
-                    Attr.TrimHistDays < 0 || Attr.TrimHistDays > 1000000 ||
+            if ( Attr.TrimHistDays < 0 || Attr.TrimHistDays > 1000000 ||
                     Attr.TrimOrdersDays < 0 || Attr.TrimOrdersDays > 1000000)
             {
                 return false;

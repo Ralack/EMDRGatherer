@@ -76,7 +76,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -91,7 +91,7 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -106,7 +106,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
             // 
             // btnStartCapture
@@ -169,6 +169,7 @@
             // 
             // tbOrdRowCnt
             // 
+            this.tbOrdRowCnt.Enabled = false;
             this.tbOrdRowCnt.Location = new System.Drawing.Point(139, 40);
             this.tbOrdRowCnt.Name = "tbOrdRowCnt";
             this.tbOrdRowCnt.Size = new System.Drawing.Size(121, 20);
@@ -178,6 +179,7 @@
             // 
             // tbHistRowCnt
             // 
+            this.tbHistRowCnt.Enabled = false;
             this.tbHistRowCnt.Location = new System.Drawing.Point(139, 13);
             this.tbHistRowCnt.Name = "tbHistRowCnt";
             this.tbHistRowCnt.Size = new System.Drawing.Size(121, 20);
